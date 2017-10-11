@@ -27,7 +27,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss(y, tx, w)
         w = w - gamma * grad
     
-    return ws, loss;
+    return w, loss;
 
 def compute_stoch_gradient(y, tx, w):
     e = y - tx @ w

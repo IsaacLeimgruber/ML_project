@@ -39,7 +39,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     
     if shuffle:
         shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices]
+        shuffled_y = y[shuffle_indices] 
         shuffled_tx = tx[shuffle_indices]
     else:
         shuffled_y = y
@@ -74,8 +74,10 @@ def least_squares(y, tx):
 
 def ridge_regression(y, tx, lambda_):
 
-    lambda_prime = 2*len(x)*lambda_
+    lambda_prime = 2*len(tx)*lambda_
     first_term = tx.T@tx
+    #sum ici les x*w
+    
     w = np.linalg.solve(first_term + lambda_prime *np.identity(len(first_term)), tx.T @ y)
     loss = compute_loss(y, tx, w)
     return w, loss;

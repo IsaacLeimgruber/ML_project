@@ -31,4 +31,4 @@ def split_data(x, y, ratio, seed=1):
     y_train = y_shuffle[:split]
     y_test = y_shuffle[split:]
     
-    return x_train, x_test, y_train, y_test
+    return x_train, y_train, x_test, y_test 

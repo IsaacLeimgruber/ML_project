@@ -7,8 +7,8 @@ stochastic_batch_size = 10;
 
 def compute_loss(y, tx, w):
     e = y - tx @ w
-    loss = np.sum(e*e)/(2*len(e))
-    return loss;
+    return np.mean(e**2)/2.
+   
 
 def compute_gradient(y, tx, w):
     e = y - tx @ w
@@ -29,10 +29,6 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     
     return w, loss;
 
-def compute_stoch_gradient(y, tx, w):
-    e = y - tx @ w
-    grad = -np.transpose(tx)@e
-    return grad;
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     data_size = len(y)
@@ -50,19 +46,22 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
+def compute_stoch_gradient(y, tx, w):
+    e = y - tx.dot(w)
+    grad = -tx.T.dot(e)
+    return grad/len(e);
+
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 
-    w = [initial_w]
-    loss = 1000;
+    w = initial_w
+    loss = 0;
     for n_iter in range(max_iters):
 
-        grad = np.zeros(2)
         for minibatch_y, minibatch_tx in batch_iter(y, tx, stochastic_batch_size):
-            grad += compute_stoch_gradient(minibatch_y, minibatch_tx, w)
-        grad = grad/stochastic_batch_size
-        loss = compute_loss(y, tx, w)
-        w = w - gamma * grad
-
+            grad = compute_stoch_gradient(minibatch_y, minibatch_tx, w)
+            w = w - gamma * grad
+            loss = compute_loss(y, tx, w)
+            
     return w, loss;
 
 def least_squares(y, tx):
@@ -74,11 +73,11 @@ def least_squares(y, tx):
 
 def ridge_regression(y, tx, lambda_):
 
-    lambda_prime = 2*len(tx)*lambda_
     first_term = tx.T@tx
     #sum ici les x*w
-    
-    w = np.linalg.solve(first_term + lambda_prime *np.identity(len(first_term)), tx.T @ y)
+    left = first_term + lambda_ *np.identity(tx.shape[1])
+    right = tx.T @ y
+    w = np.linalg.solve(left, right)
     loss = compute_loss(y, tx, w)
     return w, loss;
 

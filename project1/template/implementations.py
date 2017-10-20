@@ -3,17 +3,16 @@
 import csv
 import numpy as np
 
+from loss import *
+from gradient import *
+from batch_iter import *
+from learning_by_gradient_descent import *
+from learning_by_penalized_gradient import *
+from split_data import *
+
+
 stochastic_batch_size = 10;
 
-def compute_loss(y, tx, w):
-    e = y - tx @ w
-    return np.mean(e**2)/2.
-   
-
-def compute_gradient(y, tx, w):
-    e = y - tx @ w
-    grad = -np.transpose(tx)@e/len(e)
-    return grad;
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
@@ -28,28 +27,6 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         w = w - gamma * grad
     
     return w, loss;
-
-
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    data_size = len(y)
-    
-    if shuffle:
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices] 
-        shuffled_tx = tx[shuffle_indices]
-    else:
-        shuffled_y = y
-        shuffled_tx = tx
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-
-def compute_stoch_gradient(y, tx, w):
-    e = y - tx.dot(w)
-    grad = -tx.T.dot(e)
-    return grad/len(e);
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 
@@ -81,3 +58,42 @@ def ridge_regression(y, tx, lambda_):
     loss = compute_loss(y, tx, w)
     return w, loss;
 
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    # init parameters
+    threshold = 1e-8
+    losses = []
+    
+    # build tx
+    tx = np.c_[np.ones((y.shape[0], 1)), x]
+    w = np.zeros((tx.shape[1], 1))
+    
+    # start the logistic regression
+    for iter in range(max_iters):
+        # get loss and update w.
+        loss, w = learning_by_gradient_descent(y, tx, w, gamma)
+        
+        losses.append(loss)
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
+    return w, loss
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    # init parameters
+    threshold = 1e-8
+    losses = []
+    
+    # build tx
+    tx = np.c_[np.ones((y.shape[0], 1)), x]
+    w = np.zeros((tx.shape[1], 1))
+    
+    # start the logistic regression
+    for iter in range(max_iters):
+        # get loss and update w.
+        loss, w = learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
+        # converge criterion
+        losses.append(loss)
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
+    return w, loss

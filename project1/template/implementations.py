@@ -63,15 +63,17 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     # init parameters
     threshold = 1e-8
     losses = []
+    w = initial_w
     
     # start the logistic regression
     for iter in range(max_iters):
         # get loss and update w.
-        loss, w = learning_by_gradient_descent(y, tx, initial_w, gamma)
+        loss, w = learning_by_gradient_descent(y, tx, w, gamma)
         
         losses.append(loss)
-        #if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-        #break
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            print("shit")
+            break
     return w, loss
 
 
@@ -79,10 +81,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # init parameters
     threshold = 1e-8
     losses = []
-    
-    # build tx
-    tx = np.c_[np.ones((y.shape[0], 1)), x]
-    w = np.zeros((tx.shape[1], 1))
+    w = initial_w
     
     # start the logistic regression
     for iter in range(max_iters):

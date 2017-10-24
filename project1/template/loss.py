@@ -8,7 +8,11 @@ def compute_loss(y, tx, w):
 def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
     
-    loss = np.log(1 + np.exp(tx @ w)) - (y * (tx @ w))
+    tx_w = tx @ w
+    
+    ex = np.exp(tx_w)
+    
+    loss = np.log(1 + ex) - (y * (tx_w))
     
     sum_loss = np.sum(loss)
     

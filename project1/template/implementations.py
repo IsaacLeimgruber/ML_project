@@ -72,7 +72,6 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            print("shit")
             break
     return w, loss
 

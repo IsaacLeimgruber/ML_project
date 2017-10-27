@@ -5,14 +5,12 @@ def compute_loss(y, tx, w):
     return np.mean(e**2)/2.
 
 
+
 def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
-    
     tx_w = tx @ w
     
-    ex = np.exp(tx_w)
-    
-    loss = np.log(1 + ex) - (y * (tx_w))
+    loss = np.log(1 + np.exp(tx_w)) - (y * (tx_w))
     
     sum_loss = np.sum(loss)
     

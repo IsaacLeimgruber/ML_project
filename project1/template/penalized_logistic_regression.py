@@ -1,6 +1,5 @@
 from loss import calculate_loss
 from gradient import calculate_gradient
-from calculate_hessian import *
 
 def penalized_logistic_regression(y, tx, w, lambda_):
     """return the loss, gradient, and hessian."""

@@ -41,9 +41,19 @@
     3) Stochastic Gradient Descent (to see if it works and if it can be used after)
 
     4) Ridge Regression: 
-            In this part we tried several things, first of all we tried our Ridge algo and find the best parameters with a grid search   algorithm (function "ridge_regression_demo"). When we found it, the result was better than the least square so we submitted the result   on kaggle. However we thought that with a cross validation, our result could be improved so with the function "cross_val_ridge_demo"     which find the best parameters and "cross_val_ridge" for splitting the data and compute our weights and loss everytime. We added a   "cross_valid_vizu" function to plot the result and understand them better. We found out that the best degree gives better result and we   decided to take this degree (despite the fact that on the plot we can see that it could explode the final result)  
+            In this part we tried several things, first of all we tried our Ridge algo and find the best parameters with a grid search  
+            algorithm (function "ridge_regression_demo"). When we found it, the result was better than the least square so we submitted  
+            the result   on kaggle. However we thought that with a cross validation, our result could be improved so with the function  
+            
+            "cross_val_ridge_demo"     which find the best parameters and "cross_val_ridge" for splitting the data and compute our  
+            weights and loss everytime. We added a   "cross_valid_vizu" function to plot the result and understand them better. We found  
+            out that the best degree gives better result and we   decided to take this degree (despite the fact that on the plot we can  
+            see that it could explode the final result)   
+            
             However it didn't improve our result so we tought that the grid search worked better with the Ridge regression'  
-            At the end we found out that if we deleted some columns we could improve our result but it was too late. We added this part   to see our (little) improvement at the end of this section  
+            
+            At the end we found out that if we deleted some columns we could improve our result but it was too late. We added this part  
+            to see our (little) improvement at the end of this section  
     5) Logistic regression:
             First of all we added a function "shuffle_index_resize". This function, as the name say shuffle the index and resize our x_train and y_train. Why? this is for doing a better Stochastic gradient descent. We saw that the values at the end where -1 and 1. So st the end we choose a number of elems (same in both list) and take them. With this we will have the same amount of 1 and -1 and with this we thought that the result would be better.
             We added a function "compare_prediction2" because we saw that the sigmoid gave values between 0 and 1 and not between -1 and 1. However we decided to change the sigmoid so the values returned will be between -1 and 1 and not 0 and 1.

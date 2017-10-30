@@ -58,19 +58,32 @@
             we deleted some columns we could improve our result but it was too late.   
             We added this part to see our (little) improvement at the end of this section  
     5) Logistic regression:
-            First of all we added a function "shuffle_index_resize". This function, as the name say shuffle the index and resize our x_train and y_train. Why? this is for doing a better Stochastic gradient descent. We saw that the values at the end where -1 and 1. So st the end we choose a number of elems (same in both list) and take them. With this we will have the same amount of 1 and -1 and with this we thought that the result would be better.
-            We added a function "compare_prediction2" because we saw that the sigmoid gave values between 0 and 1 and not between -1 and 1. However we decided to change the sigmoid so the values returned will be between -1 and 1 and not 0 and 1.
+            First of all we added a function "shuffle_index_resize". This function allows  
+            us to split the data so that each fold contains roughly the same number of -1
+            data as of 1 data in the training phase. Considering the output range was [-1, 1]  
+            we adapted the sigmoid function to reflect this partiularity.  
+            At last, we found hyperparameters gamma, lambda and degree for the logistic regression
+            using a cross validation.
 
-            After that we have the cross validation for the Logistic regression. We decided to implement the Logistic penalized regression because otherwise we will have error due to overfitting.
-            In the end of this section there are the plots added on the reports to visualise our results
-
-We saw that the logistic part wasn't the best part so we decided to improve the ridge regression by loking on the data and manipulate them to have better result. That's why the next section is called New Ridge
+Since our implementation of logistic regression did not yield us tremendous results,  
+we decided to try to improve our current cross-validated ridge regression and see   
+if we could remove some features to reduce the variance we observed in our previous attempts.
 
 
     6) New Ridge:
-            In this Section we tried so split the data because we found out that one col (PRI_jet_num) indicate some groupe of data and we thought that if we group the data and find the best w for each group, our result would be improved. For this, we first took the indexes of the data where the col PRI-jet_num was different to partitionate the data. We didn't needed this column anymore so we deleted it. Secondly we add function "bad_values_in_zero" and "bad_values_in_mean" because some values where at -999 and this could penalise to much our result. So with these functions we changed the values by 0 or the mean to see the differencies (not very good but discussed later). 
-            After that we decided to implement a "ridge_Grid_search". Why? Because the best result found previously where with the grid search the result was better. At this point we iterated over the 4 groups to find the best weight.
-            Now that we have the weights, we need to implement a new function "build_prediction". It will take data x and applied the right weight depending on which group they were. Unfortunately at the end the result was very poor so we think that we missed something or our parameters weren't the best
+            First, we tried to see whether we could remove some spam feature to reduce variance.   
+            We tried Least square on truncated data and see whether removing some feature reduced  
+            our ratio consequently. When it did not, we tried to run a cross validation on the truncated  
+            data to confirm our intuition. We ended up removing two features.  
+            Secondly we added function "bad_values_in_zero" and "bad_values_in_mean" because some values   
+            where at -999 and this could penalise to much our result. So with these functions we   
+            changed the values by 0 or the mean to see the differencies (not very good but discussed later).   
+            
+            In the end, our best result is still a grid-search with ridge regression over the lambdas.
 
     7) Cross Validation new Ridge:
-            We found out previously that the final result weren't good. So to be sure of our parameters, we decided to do a cross validation and plot the result to understand what we did wrong. What seems strange, is that our graphs are pretty good but give a result very poor. You can see the plots on the last part of the file. We didn't added to the report because our assumptions have unfortunately proved wrong. We were sure that with this technic, our result would be improved but it wasn't the case.'
+            We found out previously that the final result weren't good. So to be sure of our parameters,  
+            we decided to do a cross validation and plot the result to understand what we did wrong. What  
+            seems strange, is that our graphs are pretty good but give a result very poor. You can see the  
+            plots on the last part of the file. We didn't add to the report because our assumptions have   
+            unfortunately proved wrong. We were sure that with this technic, our result would be improved but it wasn't the case.'

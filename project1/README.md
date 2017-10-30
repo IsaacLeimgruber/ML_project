@@ -42,11 +42,11 @@
 
     4) Ridge Regression: 
             In this part we tried several things, first of all we tried our Ridge 
-            algo and find the best parameters with a grid search  
-            algorithm (function "ridge_regression_demo").   
-            When we found it, the result was better than the least square so we submitted  
-            the result   on kaggle. However we thought that with a cross validation,  
-            our result could be improved so with the function  
+            algo and find the best parameters with a grid search algorithm (func-  
+            tion "ridge_regression_demo"). When we found it, the result was better  
+            than the least square so we submitted the result on kaggle. However we  
+            thought that with a cross validation, our result could be improved so   
+            with the function  
             "cross_val_ridge_demo"which find the best parameters and  
             "cross_val_ridge" for splitting the data and compute our  
             weights and loss everytime. We added a   "cross_valid_vizu"   

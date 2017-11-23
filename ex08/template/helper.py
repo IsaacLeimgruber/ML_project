@@ -46,3 +46,4 @@ def build_distance_matrix(data, mu):
         sum_squares = np.sum(np.square(data - mu[k_th, :]), axis=1)
         distance_list.append(sum_squares)
     return np.matrix(distance_list).T
+    result = list(data)

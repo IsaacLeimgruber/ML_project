@@ -27,7 +27,7 @@ def main():
     for epoch in range(epochs):
         print("epoch {}".format(epoch))
         for ix, jy, n in zip(cooc.row, cooc.col, cooc.data):
-
+            print()
 			# fill in your SGD code here, 
 			# for the update resulting from co-occurence (i,j)
 		

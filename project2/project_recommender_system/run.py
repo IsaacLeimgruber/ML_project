@@ -18,23 +18,22 @@ def main():
     rows = []
     cols = []
     ratings = []
-    for iRow in data:
-        row, col, rating = parse_row(iRow)
-        rows.append(row)
-        cols.append(col)
-        ratings.append(rating)
-    data_matrix = csr.csr_matrix((ratings, (rows, cols)), shape=(10000, 1000))
-    print(data_matrix.nonzero())
-    print(data_matrix[0,9])
+    #for iRow in data:
+    #    row, col, rating = parse_row(iRow)
+    #    rows.append(row)
+    #    cols.append(col)
+    #    ratings.append(rating)
+    #data_matrix = csr.csr_matrix((ratings, (rows, cols)), shape=(10000, 1000))
+    #print(data_matrix.nonzero())
+    #print(data_matrix[0,9])
 
     ratings = load_data(DATA_PATH);
 
-    num_items_per_user, num_users_per_item = plot_raw_data(ratings)
+    #num_items_per_user, num_users_per_item = plot_raw_data(ratings)
 
-    print("min # of items per user = {}, min # of users per item = {}.".format(
-        min(num_items_per_user), min(num_users_per_item)))
+    #print("min # of items per user = {}, min # of users per item = {}.".format(min(num_items_per_user), min(num_users_per_item)))
 
-    valid_ratings, train, test = split_data(ratings, num_items_per_user, num_users_per_item, min_num_ratings=10, p_test=0.1)
+    valid_ratings, train, test = split_data(ratings, 10000, 1000, min_num_ratings=5, p_test=0.1)
 
 
 
@@ -53,12 +52,6 @@ def parse_row(row):
 
 
 def split_data(ratings, num_items_per_user, num_users_per_item,min_num_ratings, p_test=0.1):
-    """split the ratings to training data and test data.
-    Args:
-        min_num_ratings:
-            all users and items we keep must have at least min_num_ratings per user and per item.
-    """
-    # set seed
     np.random.seed(988)
 
     # select user and item based on the condition.
@@ -91,9 +84,9 @@ def split_data(ratings, num_items_per_user, num_users_per_item,min_num_ratings, 
         # add to test set
         test[selects, user] = valid_ratings[selects, user]
 
-    print("Total number of nonzero elements in origial data:{v}".format(v=ratings.nnz))
-    print("Total number of nonzero elements in train data:{v}".format(v=train.nnz))
-    print("Total number of nonzero elements in test data:{v}".format(v=test.nnz))
+    #print("Total number of nonzero elements in origial data:{v}".format(v=ratings.nnz))
+    #print("Total number of nonzero elements in train data:{v}".format(v=train.nnz))
+    #print("Total number of nonzero elements in test data:{v}".format(v=test.nnz))
     return valid_ratings, train, test
 
 if __name__ == '__main__':

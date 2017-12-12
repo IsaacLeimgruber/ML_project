@@ -73,6 +73,7 @@ def calculate_averages(data_user, data_movie):
         avgUser[i] = sum_user.T[i] / columns_user[i,0]
         resultUser[i] = sum_user.T[i] / columns_user[i,0]
 
+
     avgMovie = {}
     resultMovie = np.zeros(np.shape(sum_movie))
     for i in range(len(columns_movie)):

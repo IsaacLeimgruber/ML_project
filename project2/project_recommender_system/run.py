@@ -18,30 +18,106 @@ def main():
     rows = []
     cols = []
     ratings = []
-    #for iRow in data:
-    #    row, col, rating = parse_row(iRow)
-    #    rows.append(row)
-    #    cols.append(col)
-    #    ratings.append(rating)
-    #data_matrix = csr.csr_matrix((ratings, (rows, cols)), shape=(10000, 1000))
-    #print(data_matrix.nonzero())
-    #print(data_matrix[0,9])
+    for iRow in data:
+        row, col, rating = parse_row(iRow)
+        rows.append(row)
+        cols.append(col)
+        ratings.append(rating)
+    data_matrix_user = csr.csr_matrix((ratings, (rows, cols)), shape=(10000, 1000))
+    data_matrix_movie = csr.csr_matrix((ratings, (cols, rows)), shape=(1000, 10000))
+    print(data_matrix_user.nonzero())
+    print(data_matrix_movie.nonzero())
+    print(data_matrix_user[0,9])
+    print(data_matrix_user.nonzero()[0])
+    print(data_matrix_user.nonzero()[1])
 
-    ratings = load_data(DATA_PATH);
+    avgUser, avgMovie, avgGlobal = calculate_averages(data_matrix_user, data_matrix_movie)
 
-    #num_items_per_user, num_users_per_item = plot_raw_data(ratings)
+    print(avgUser)
+    print(avgMovie)
+    print(avgGlobal)
 
-    #print("min # of items per user = {}, min # of users per item = {}.".format(min(num_items_per_user), min(num_users_per_item)))
+    prediction = np.zeros((10000,1000))
 
-    valid_ratings, train, test = split_data(ratings, 10000, 1000, min_num_ratings=5, p_test=0.1)
+    for i in range(len(prediction)):
+        if(i % 1000 == 0):
+            print(i)
+        for j in range(len(prediction[i])):
+            if(data_matrix_user[i,j] != 0):
+                prediction[i][j] = data_matrix_user[i,j]
+            else:
+                prediction[i][j] = avgGlobal
+
+    print(prediction)
+
+    create_submission(prediction, "GLOBAL_AVG.csv")
 
 
 
+def calculate_averages(data_user, data_movie):
+    user = data_user.nonzero()[0]
+    movie = data_movie.nonzero()[0]
+
+    one_user = np.ones(np.shape(data_user)[1])
+    one_movie = np.ones(np.shape(data_movie)[1])
+
+    sum_user = data_user.dot(one_user)
+    sum_movie = data_movie.dot(one_movie)
+
+    columns_user = (data_user != 0).sum(1)
+    columns_movie = (data_movie != 0).sum(1)
+
+    avgUser = {}
+    resultUser = np.zeros(np.shape(sum_user))
+    for i in range(len(columns_user)):
+        avgUser[i] = sum_user.T[i] / columns_user[i,0]
+        resultUser[i] = sum_user.T[i] / columns_user[i,0]
+
+    avgMovie = {}
+    resultMovie = np.zeros(np.shape(sum_movie))
+    for i in range(len(columns_movie)):
+        avgMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
+        resultMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
+
+    avgGlobal_user = np.sum(resultUser) / np.shape(resultUser)[0]
+    avgGlobal_movie = np.sum(resultMovie) / np.shape(resultMovie)[0]
+
+    '''
+    for i in range(len(user)):
+        if(i % 100000 == 0):
+            print(i)
+
+        if(i != 0):
+            if(user[i] == user[i-1]):
+                sum_user = sum_user + data_user[user[i],data_user.nonzero()[1][i]]
+            else:
+                avgUser[user[i]] = sum_user / nb_rating_user
+                avgGlobal_user = avgGlobal_user + avgUser[user[i]]
+                sum_user = data_user[user[i],data_user.nonzero()[1][i]]
+                nb_rating_user = 0
+
+            if (movie[i] == movie[i - 1]):
+                sum_movie = sum_movie + data_movie[movie[i], data_movie.nonzero()[1][i]]
+            else:
+                avgMovie[movie[i]] = sum_movie / nb_rating_movie
+                avgGlobal_movie = avgGlobal_movie + avgMovie[movie[i]]
+                sum_movie = data_movie[movie[i], data_movie.nonzero()[1][i]]
+                nb_rating_movie = 0
+
+        else:
+            sum_user = data_user[user[i],data_user.nonzero()[1][i]]
+            sum_movie = data_user[movie[i], data_movie.nonzero()[1][i]]
+            print(sum_user)
+            print(movie)
+
+        nb_rating_user = nb_rating_user + 1
+        nb_rating_movie = nb_rating_movie + 1
+    '''
+    avgGlobal = (avgGlobal_user + avgGlobal_movie) / 2
+
+    return avgUser, avgMovie, avgGlobal
 
 
-# row is in the form ["cidxcol_ridxrow", 'rating']. In order to store our data
-# in a sparse matrix, we iterate over the values in data_train and parse each row.
-# parse_row will return a 3-tuple (row, col, rating) where all 3 values are ints
 def parse_row(row):
     row_col_str = row[0]
     rating = int(row[1])
@@ -50,44 +126,17 @@ def parse_row(row):
     col = int(row_col_str[_idx + 2:]) - 1
     return row, col, rating
 
+def create_submission(data, filename="submission.csv"):
 
-def split_data(ratings, num_items_per_user, num_users_per_item,min_num_ratings, p_test=0.1):
-    np.random.seed(988)
+    print("Creating submission " + str(filename))
+    f = open(filename,"w")
+    f.write("Id,Prediction\n")
+    for userIdx in range(len(data)):
+        for movieIdx in range(len(data[userIdx])):
+            rating = data[userIdx][movieIdx]
+            f.write('r{0}_c{1},{2}'.format(userIdx,movieIdx,rating) + "\n")
+    f.close()
 
-    # select user and item based on the condition.
-    valid_users = np.where(num_items_per_user >= min_num_ratings)[0]
-    valid_items = np.where(num_users_per_item >= min_num_ratings)[0]
-    valid_ratings = ratings[valid_items, :][:, valid_users]
-
-    # init
-    num_rows, num_cols = valid_ratings.shape
-    train = sp.lil_matrix((num_rows, num_cols))
-    test = sp.lil_matrix((num_rows, num_cols))
-
-    print("the shape of original ratings. (# of row, # of col): {}".format(
-        ratings.shape))
-    print("the shape of valid ratings. (# of row, # of col): {}".format(
-        (num_rows, num_cols)))
-
-    nz_items, nz_users = valid_ratings.nonzero()
-
-    # split the data
-    for user in set(nz_users):
-        # randomly select a subset of ratings
-        row, col = valid_ratings[:, user].nonzero()
-        selects = np.random.choice(row, size=int(len(row) * p_test))
-        residual = list(set(row) - set(selects))
-
-        # add to train set
-        train[residual, user] = valid_ratings[residual, user]
-
-        # add to test set
-        test[selects, user] = valid_ratings[selects, user]
-
-    #print("Total number of nonzero elements in origial data:{v}".format(v=ratings.nnz))
-    #print("Total number of nonzero elements in train data:{v}".format(v=train.nnz))
-    #print("Total number of nonzero elements in test data:{v}".format(v=test.nnz))
-    return valid_ratings, train, test
 
 if __name__ == '__main__':
     main()

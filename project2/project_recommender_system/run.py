@@ -41,10 +41,13 @@ def main():
 
     prediction = []
     for iRow in sub_data:
-        row, col, rating = parse_row_submission(iRow)
-        prediction.append([row, col, avgGlobal])
+        user, movie, rating = parse_row(iRow)
+        rate = int(np.round(avgMovie[movie]))
+        #rate = avgGlobal
+        prediction.append([user+1, movie+1, rate])
 
-    create_submission(prediction, "GLOBAL_AVG.csv")
+    create_submission(prediction, "GLOBAL_MOVIE_AVG.csv")
+    #create_submission(prediction, "GLOBAL_AVG.csv")
 
 
 
@@ -120,14 +123,6 @@ def parse_row(row):
     _idx = row_col_str.find('_')
     row = int(row_col_str[1:_idx]) - 1
     col = int(row_col_str[_idx + 2:]) - 1
-    return row, col, rating
-
-def parse_row_submission(row):
-    row_col_str = row[0]
-    rating = int(row[1])
-    _idx = row_col_str.find('_')
-    row = int(row_col_str[1:_idx])
-    col = int(row_col_str[_idx + 2:])
     return row, col, rating
 
 def create_submission(data, filename="submission.csv"):

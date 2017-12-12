@@ -7,10 +7,12 @@ import scipy.sparse as sp
 import matplotlib.pyplot as plt
 # https://www.overleaf.com/12522751fsgrdpydrwxf READ and EDIT link for report
 DATA_PATH = "data_train.csv"
+DATA_PATH_SUB = "sample_submission.csv"
 
 
 def main():
     data = np.genfromtxt(DATA_PATH, delimiter=",", skip_header=1, dtype=str)
+    sub_data = np.genfromtxt(DATA_PATH_SUB, delimiter=",", skip_header=1, dtype=str)
     print(data)
     print(len(data))
     print("c10_r20"[1:3])
@@ -37,18 +39,10 @@ def main():
     print(avgMovie)
     print(avgGlobal)
 
-    prediction = np.zeros((10000,1000))
-
-    for i in range(len(prediction)):
-        if(i % 1000 == 0):
-            print(i)
-        for j in range(len(prediction[i])):
-            if(data_matrix_user[i,j] != 0):
-                prediction[i][j] = data_matrix_user[i,j]
-            else:
-                prediction[i][j] = avgGlobal
-
-    print(prediction)
+    prediction = []
+    for iRow in sub_data:
+        row, col, rating = parse_row_submission(iRow)
+        prediction.append([row, col, avgGlobal])
 
     create_submission(prediction, "GLOBAL_AVG.csv")
 
@@ -114,7 +108,8 @@ def calculate_averages(data_user, data_movie):
         nb_rating_user = nb_rating_user + 1
         nb_rating_movie = nb_rating_movie + 1
     '''
-    avgGlobal = (avgGlobal_user + avgGlobal_movie) / 2
+    #avgGlobal = (avgGlobal_user + avgGlobal_movie) / 2
+    avgGlobal = int(np.round(avgGlobal_movie))
 
     return avgUser, avgMovie, avgGlobal
 
@@ -127,15 +122,21 @@ def parse_row(row):
     col = int(row_col_str[_idx + 2:]) - 1
     return row, col, rating
 
+def parse_row_submission(row):
+    row_col_str = row[0]
+    rating = int(row[1])
+    _idx = row_col_str.find('_')
+    row = int(row_col_str[1:_idx])
+    col = int(row_col_str[_idx + 2:])
+    return row, col, rating
+
 def create_submission(data, filename="submission.csv"):
 
     print("Creating submission " + str(filename))
     f = open(filename,"w")
     f.write("Id,Prediction\n")
-    for userIdx in range(len(data)):
-        for movieIdx in range(len(data[userIdx])):
-            rating = data[userIdx][movieIdx]
-            f.write('r{0}_c{1},{2}'.format(userIdx,movieIdx,rating) + "\n")
+    for user, movie, rating in data:
+        f.write('r{0}_c{1},{2}'.format(user,movie,rating) + "\n")
     f.close()
 
 

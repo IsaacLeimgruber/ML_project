@@ -106,6 +106,7 @@ def run_ALS(train, test, num_features, lambda_user, lambda_item):
             nnz_users_per_item, nz_item_userindices)
 
         error = compute_error(train, user_features, item_features, nz_train)
+        print("RMSE on training set: {}.".format(error))
         error_list.append(error)
         change = np.fabs(error_list[-1] - error_list[-2])
 
@@ -113,4 +114,5 @@ def run_ALS(train, test, num_features, lambda_user, lambda_item):
     nnz_row, nnz_col = test.nonzero()
     nnz_test = list(zip(nnz_row, nnz_col))
     rmse = compute_error(test, user_features, item_features, nnz_test)
+    print("test RMSE after running ALS: {v}.".format(v=rmse))
     return rmse, user_features, item_features

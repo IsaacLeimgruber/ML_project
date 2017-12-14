@@ -15,10 +15,6 @@ DATA_PATH_SUB = "sample_submission.csv"
 def main():
     data = np.genfromtxt(DATA_PATH, delimiter=",", skip_header=1, dtype=str)
     sub_data = np.genfromtxt(DATA_PATH_SUB, delimiter=",", skip_header=1, dtype=str)
-    print(data)
-    print(len(data))
-    print("c10_r20"[1:3])
-    print(parse_row(["c10_r20", '4']))
 
     userId, movieId, rating = construct_data(data);
 
@@ -29,12 +25,10 @@ def main():
 
     data_XTrain = csr.csr_matrix((X_train_rating, (X_train_userId, X_train_movieId)), shape=(10000, 1000))
     data_XTest = csr.csr_matrix((X_test_rating, (X_test_userId, X_test_movieId)), shape=(10000, 1000))
-    # print(data_XTrain.nonzero())
-    # print(data_XTrain[0,9])
-    # print(data_XTrain.nonzero()[0])
-    # print(data_XTrain.nonzero()[1])
-    #print(data_matrix_movie.index(928))
+    #print((data_XTrain.T).index(928))
     # attention no movie 928?
+
+    print("TEST ALS")
 
     rmse, users, items = run_ALS(data_XTrain, data_XTest, 20, 0.1, 0.7)
     print("rmse als", rmse)
@@ -51,86 +45,8 @@ def main():
         #rate = avgGlobal
         prediction.append([user+1, movie+1, rate])
 
-    create_submission(prediction, "GLOBAL_MOVIE_AVG.csv")
+    #create_submission(prediction, "GLOBAL_MOVIE_AVG.csv")
     #create_submission(prediction, "GLOBAL_AVG.csv")
-
-    print("TEST SGD")
-
-    sgd(data_XTrain, data_XTest)
-
-
-def init_MF(train, num_features):
-    """init the parameter for matrix factorization."""
-
-    num_item, num_user = train.get_shape()
-
-    user_features = np.random.rand(num_features, num_user)
-    item_features = np.random.rand(num_features, num_item)
-
-    # start by item features.
-    item_nnz = train.getnnz(axis=1)
-    item_sum = train.sum(axis=1)
-
-    for ind in range(num_item):
-        item_features[0, ind] = item_sum[ind, 0] / item_nnz[ind]
-    return user_features, item_features
-
-
-def compute_error(data, user_features, item_features, nz):
-    """compute the loss (MSE) of the prediction of nonzero elements."""
-    mse = 0
-    for row, col in nz:
-        item_info = item_features[:, row]
-        user_info = user_features[:, col]
-        mse += (data[row, col] - user_info.T.dot(item_info)) ** 2
-    return np.sqrt(1.0 * mse / len(nz))
-
-
-def sgd(train, test):
-    gamma = 0.01
-    num_features = 20  # K in the lecture notes
-    lambda_user = 0.1
-    lambda_item = 0.7
-    num_epochs = 20  # number of full passes through the train set
-    errors = [0]
-
-    user_features, item_features = init_MF(train, num_features)
-
-    nz_row, nz_col = train.nonzero()
-    nz_train = list(zip(nz_row, nz_col))
-    nz_row, nz_col = test.nonzero()
-    nz_test = list(zip(nz_row, nz_col))
-
-
-    print("learn the matrix factorization using SGD...")
-    for it in range(num_epochs):
-        # shuffle the training rating indices
-        np.random.shuffle(nz_train)
-
-        # decrease step size
-        gamma /= 1.2
-
-        for d, n in nz_train:
-            # update W_d (item_features[:, d]) and Z_n (user_features[:, n])
-            item_info = item_features[:, d]
-            user_info = user_features[:, n]
-            err = train[d, n] - user_info.T.dot(item_info)
-
-            # calculate the gradient and update
-            item_features[:, d] += gamma * (err * user_info - lambda_item * item_info)
-            user_features[:, n] += gamma * (err * item_info - lambda_user * user_info)
-
-        rmse = compute_error(train, user_features, item_features, nz_train)
-        print("iter: {}, RMSE on training set: {}.".format(it, rmse))
-
-        errors.append(rmse)
-
-    # evaluate the test error
-    rmse = compute_error(test, user_features, item_features, nz_test)
-    print("RMSE on test data: {}.".format(rmse))
-
-
-
 
 def split_data(idx, userId, movieId, rating, perc_train):
     shuffle(idx)

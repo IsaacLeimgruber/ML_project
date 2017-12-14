@@ -1,6 +1,33 @@
 import numpy as np
 import scipy.sparse as csr
 from itertools import groupby
+from random import shuffle
+
+def construct_data(data_):
+    rows = []
+    cols = []
+    ratings = []
+    for iRow in data_:
+        row, col, rating = parse_row(iRow)
+        rows.append(row)
+        cols.append(col)
+        ratings.append(rating)
+    return rows,cols,ratings
+
+def split_data(idx, userId, movieId, rating, perc_train):
+    shuffle(idx)
+    idx_te = int(perc_train * len(idx) / 100.0)
+    X_train_idx = idx[0:idx_te]
+    X_test_idx = idx[idx_te:len(idx)]
+
+    X_train_userId = [userId[i] for i in X_train_idx]
+    X_train_movieId = [movieId[i] for i in X_train_idx]
+    X_train_rating = [rating[i] for i in X_train_idx]
+    X_test_userId = [userId[i] for i in X_test_idx]
+    X_test_movieId = [movieId[i] for i in X_test_idx]
+    X_test_rating = [rating[i] for i in X_test_idx]
+
+    return X_train_userId, X_train_movieId, X_train_rating, X_test_userId, X_test_movieId, X_test_rating
 
 def parse_row(row):
     row_col_str = row[0]
@@ -47,3 +74,13 @@ def group_by(data, index):
     sorted_data = sorted(data, key=lambda x: x[index])
     groupby_data = groupby(sorted_data, lambda x: x[index])
     return groupby_data
+
+
+def create_submission(data, filename="submission.csv"):
+
+    print("Creating submission " + str(filename))
+    f = open(filename,"w")
+    f.write("Id,Prediction\n")
+    for user, movie, rating in data:
+        f.write('r{0}_c{1},{2}'.format(user,movie,rating) + "\n")
+    f.close()

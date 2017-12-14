@@ -51,6 +51,10 @@ def main():
     create_submission(prediction, "GLOBAL_MOVIE_AVG.csv")
     #create_submission(prediction, "GLOBAL_AVG.csv")
 
+    print("TEST SGD")
+
+    sgd(data_XTrain, data_XTest)
+
 
 def init_MF(train, num_features):
     """init the parameter for matrix factorization."""

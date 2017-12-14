@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse as csr
+from random import shuffle
 from plots import plot_raw_data
 from helpers import load_data, preprocess_data
 import scipy.sparse as sp
@@ -17,21 +18,21 @@ def main():
     print(len(data))
     print("c10_r20"[1:3])
     print(parse_row(["c10_r20", '4']))
-    rows = []
-    cols = []
-    ratings = []
-    for iRow in data:
-        row, col, rating = parse_row(iRow)
-        rows.append(row)
-        cols.append(col)
-        ratings.append(rating)
-    data_matrix_user = csr.csr_matrix((ratings, (rows, cols)), shape=(10000, 1000))
-    data_matrix_movie = csr.csr_matrix((ratings, (cols, rows)), shape=(1000, 10000))
+
+    X_train_csv, X_test_csv = split_data(data, 100)
+    print(len(X_train_csv) + len(X_test_csv))
+
+    X_train_userId, X_train_movieId, X_train_rating = construct_data(data);
+
+    data_matrix_user = csr.csr_matrix((X_train_rating, (X_train_userId, X_train_movieId)), shape=(10000, 1000))
+    data_matrix_movie = csr.csr_matrix((X_train_rating, (X_train_movieId, X_train_userId)), shape=(1000, 10000))
     print(data_matrix_user.nonzero())
     print(data_matrix_movie.nonzero())
     print(data_matrix_user[0,9])
     print(data_matrix_user.nonzero()[0])
     print(data_matrix_user.nonzero()[1])
+    #print(data_matrix_movie.index(928))
+    # attention no movie 928?
 
     avgUser, avgMovie, avgGlobal = calculate_averages(data_matrix_user, data_matrix_movie)
 
@@ -50,6 +51,25 @@ def main():
     #create_submission(prediction, "GLOBAL_AVG.csv")
 
 
+def split_data(data, perc_train):
+    shuffle(data)
+    idx_te = int(perc_train * len(data) / 100.0)
+    print(idx_te)
+    X_train = data[0:idx_te]
+    X_test = data[idx_te:len(data)]
+
+    return X_train, X_test
+
+def construct_data(data_):
+    rows = []
+    cols = []
+    ratings = []
+    for iRow in data_:
+        row, col, rating = parse_row(iRow)
+        rows.append(row)
+        cols.append(col)
+        ratings.append(rating)
+    return rows,cols,ratings
 
 def calculate_averages(data_user, data_movie):
     user = data_user.nonzero()[0]
@@ -74,8 +94,12 @@ def calculate_averages(data_user, data_movie):
     avgMovie = {}
     resultMovie = np.zeros(np.shape(sum_movie))
     for i in range(len(columns_movie)):
-        avgMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
-        resultMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
+        if(columns_movie[i, 0] != 0):
+            avgMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
+            resultMovie[i] = sum_movie.T[i] / columns_movie[i, 0]
+        else:
+            avgMovie[i] = sum_movie.T[i]
+            resultMovie[i] = sum_movie.T[i]
 
     avgGlobal_user = np.sum(resultUser) / np.shape(resultUser)[0]
     avgGlobal_movie = np.sum(resultMovie) / np.shape(resultMovie)[0]

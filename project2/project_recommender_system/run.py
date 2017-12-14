@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as csr
 from random import shuffle
+from ALS import run_ALS
 from plots import plot_raw_data
 from helpers import load_data, preprocess_data
 import scipy.sparse as sp
@@ -21,20 +22,22 @@ def main():
 
     userId, movieId, rating = construct_data(data);
 
-    indices_to_shuffle = range(len(userId))
+    indices_to_shuffle = np.array(range(len(userId)))
     print("test")
 
-    X_train_userId, X_train_movieId, X_train_rating, X_test_userId, X_test_movieId, X_test_rating = split_data(indices_to_shuffle, userId, movieId, rating, 100)
+    X_train_userId, X_train_movieId, X_train_rating, X_test_userId, X_test_movieId, X_test_rating = split_data(indices_to_shuffle, userId, movieId, rating, 70)
 
     data_XTrain = csr.csr_matrix((X_train_rating, (X_train_userId, X_train_movieId)), shape=(10000, 1000))
     data_XTest = csr.csr_matrix((X_test_rating, (X_test_userId, X_test_movieId)), shape=(10000, 1000))
-    print(data_XTrain.nonzero())
-    print(data_XTrain[0,9])
-    print(data_XTrain.nonzero()[0])
-    print(data_XTrain.nonzero()[1])
+    # print(data_XTrain.nonzero())
+    # print(data_XTrain[0,9])
+    # print(data_XTrain.nonzero()[0])
+    # print(data_XTrain.nonzero()[1])
     #print(data_matrix_movie.index(928))
     # attention no movie 928?
 
+    rmse, users, items = run_ALS(data_XTrain, data_XTest, 20, 0.1, 0.7)
+    print("rmse als", rmse)
     avgUser, avgMovie, avgGlobal = calculate_averages(data_XTrain)
 
     print(avgUser)

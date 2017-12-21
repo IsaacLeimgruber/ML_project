@@ -74,15 +74,17 @@ def main():
         data_test = Dataset.load_from_df(df_test[['userID', 'itemID', 'rating']], reader_test)
         data_test.split(split)
 
-        #KNN (takes to long to test all of them but you can check)
-        #n_epochs = [5,10,15]
-        #reg_us = [5,10,15,20]
-        #reg_is = [5,10,20]
-
         # KNN best param
         n_epochs = [5]
         reg_us = [5]
         reg_is = [5]
+
+        '''
+        #KNN (takes to long to test all of them but you can check)
+        n_epochs = [5,10,15]
+        reg_us = [5,10,15,20]
+        reg_is = [5,10,20]
+        '''
 
         # Apply the grid search for KNN
         perf_knn_grid = grid_search_knn_surprise(data_train, n_epochs, reg_us, reg_is)
@@ -109,19 +111,21 @@ def main():
             # KNN with the best params from GridSearch surprise
             knn_surprise(data_train, perf_knn_grid["n_epochs"], perf_knn_grid["reg_u"], perf_knn_grid["reg_i"],"surprise_bestKNN50.csv")
 
-        #SVD (takes to long to test all of them but you can check)
-        #n_epochs = [5,10]
-        #lr_alls = [0.00145, 0.00146, 0.00147]
-        #reg_alls = [0.2,0.3]
-        #init_mean = [0, 0.2]
-        #n_factors = [80,100,120]
-
         # SVD best param
         n_epochs = [10]
         lr_alls = [0.00147]
         reg_alls = [0.2]
         init_mean = [0.2]
         n_factors = [80]
+
+        '''
+        #SVD (takes to long to test all of them but you can check)
+        n_epochs = [5,10]
+        lr_alls = [0.00145, 0.00146, 0.00147]
+        reg_alls = [0.2,0.3]
+        init_mean = [0, 0.2]
+        n_factors = [80,100,120]
+        '''
 
         # Apply the grid search for SVD
         perf_svd_grid = grid_search_svd_surprise(data_train, n_epochs, lr_alls, reg_alls, init_mean, n_factors)

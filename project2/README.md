@@ -26,7 +26,7 @@ on data train then compute baselines with data test
 * calculate_averages: computes the user and movie averages of the data, returns two array of length K and D where shape(data) = [K, D]
 * calculate_mse: computes the mse between the labels and the predictions
 * make_prediction_surprise: make a prediction when we call knn_surprise from surprise_knn or svd_surprise from surprise_svd
-* user_movie_bigger_x_ratings: This function will remove all the elements that appears less than x times. For us, it will remove all user and all movies that appears less than x times. It looks at the indices and delet them if the sum is less than x. it was very important to mix the indices otherwise the ratings would no longer belong to the same user or movie...
+* user_movie_bigger_x_ratings: creates ratings, rows, cols from train arrays "userId", "movieId", "rating",
 
 #### ALS.py
 Contains ALS implementation (not the surprise one)
@@ -60,10 +60,10 @@ We implemented this algorithm because it's one of the best of the surprise libra
 
 ### surprise_cross_validation.py
 Contains functions that make grid search on a hyper parameter list to determine the best hyper parameter (on surprise).
-* grid_search_knn_surprise: On a list of hyper parameters, it will create the Grid search algo (from surprise) and return the best hyper parameters (for the function knn_surprise)
-* grid_search_knn: On a list of parameters, we do manually a Cross validation on KNN algo from surprise (and stores the results of training and testing sets). We do it manually because we wanted to see all the results and not only the best one as the GridSearch function of surprise does. This is to study each case and perhaps to make a graphs of the results. It stores every RMSE mean and all hyper parameters in a xslx file.
-* grid_search_svd_surprise: On a list of hyper parameters, it will create the Grid search algo (from surprise) and return the best hyper parameters (for the function svd_surprise)
-* grid_search_svd: On a list of parameters, we do manually a Cross validation on SVD algo from surprise (and stores the results of training and testing sets).It stores every RMSE mean and all hyper parameters in a xslx file and we do it for the same reason as grid_search_knn (store and see every results)
+* grid_search_knn_surprise: cross-validates over hyper parameters "n_epochs", "reg_u", "reg_i" for the KNN built-in surprise method and return the best ones (for the function knn_surprise).
+* grid_search_knn: cross-validates over hyper parameters "n_epochs", "reg_u", "reg_i" for the KNN built-in surprise method and store the Hyper parameters and the RMSE of the training set and testing set on a xlsx file (for exemple: surpise_manualGS_KNN.xlsx).
+* grid_search_svd_surprise: cross-validates over hyper parameters "n_epochs", "lr_all", "reg_all", "init_mean", "n_factors" for the SVD built-in surprise method and return the best ones (for the function svd_surprise)
+* grid_search_svd: cross-validates over hyper parameters "n_epochs", "lr_all", "reg_all", "init_mean", "n_factors" for the SVD built-in surprise method and store the Hyper parameters and the RMSE of the training set and testing set on a xlsx file (for exemple: surpise_manualGS_SVD.xlsx).
 
 ### surprise_run.py
 This run contains everything to Grid search the hyper parameters for KNN and SVD surprise and make prediction.

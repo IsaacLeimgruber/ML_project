@@ -96,7 +96,7 @@ def keep_user_bigger_x_ratings(userId, movieId, rating, nb_rating):
             print(i)
         idx_occurences = [k for k,val in enumerate(new_userId) if val==i]
         if(len(idx_occurences) < nb_rating and len(idx_occurences) > 0):
-            print("DELET")
+            print("DELETE USER")
             for j in idx_occurences:
                 new_userId = new_userId[:j] + new_userId[j + 1:]
                 new_movieId = new_movieId[:j] + new_movieId[j + 1:]
@@ -108,7 +108,7 @@ def keep_user_bigger_x_ratings(userId, movieId, rating, nb_rating):
             print(i)
         idx_occurences = [k for k,val in enumerate(new_movieId) if val==i]
         if(len(idx_occurences) < nb_rating and len(idx_occurences) > 0):
-            print("DELET")
+            print("DELETE MOVIE")
             for j in idx_occurences:
                 new_userId = new_userId[:j] + new_userId[j + 1:]
                 new_movieId = new_movieId[:j] + new_movieId[j + 1:]

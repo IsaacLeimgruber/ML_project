@@ -8,10 +8,10 @@ from surprise import evaluate
 import xlsxwriter
 
 # Here we use the grid search algo from surprise and return the best elems
-def grid_search_als_surprise(data_train, n_epochs, reg_u, reg_i):
-    print('ALS Surprise grid search')
+def grid_search_knn_surprise(data_train, n_epochs, reg_u, reg_i):
+    print('KNN Surprise grid search')
 
-    #Construct ALS algo with params
+    #Construct KNN algo with params
     param_grid = {'bsl_options': {'method': ['als'],
                                   'n_epochs' : n_epochs,
                                   'reg_u': reg_u,
@@ -32,9 +32,9 @@ def grid_search_als_surprise(data_train, n_epochs, reg_u, reg_i):
     return grid_search.best_params['RMSE']["bsl_options"]
 
 # Here we use the ALS algo manually. We compute manually the the algo and store the values
-def grid_search_als(data_train, data_test, n_epochs, reg_us, reg_is, file_name):
+def grid_search_knn(data_train, data_test, n_epochs, reg_us, reg_is, file_name):
 
-    print('ALS Surprise manual grid search')
+    print('KNN Surprise manual grid search')
 
     result_train = pd.DataFrame()
     result_test = pd.DataFrame()

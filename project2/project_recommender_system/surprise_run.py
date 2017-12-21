@@ -17,7 +17,8 @@ DATA_PATH_SUB = "sample_submission.csv"
 
 def main():
     #Here we have 4 data that can be taken for the test. The basic one, the others with users and movies that have more than 10, 20 and 50 ratings
-    for i in range(4):
+    elem_to_import = 4
+    for i in range(elem_to_import):
         if(i == 0):
             #Import the basic data
             data_import = np.genfromtxt(DATA_PATH, delimiter=",", skip_header=1, dtype=str)
@@ -84,29 +85,29 @@ def main():
         reg_is = [5]
 
         # Apply the grid search for KNN
-        perf_als_grid = grid_search_als_surprise(data_train, n_epochs, reg_us, reg_is)
+        perf_knn_grid = grid_search_knn_surprise(data_train, n_epochs, reg_us, reg_is)
 
         if (i == 0):
             #Manual grid search so we can see the values (only the result is given with the GridSearch of surprise)
-            grid_search_als(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN.xlsx')
+            grid_search_knn(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN.xlsx')
             # KNN with the best params from GridSearch surprise
-            knn_surprise(data_train, perf_als_grid["n_epochs"], perf_als_grid["reg_u"], perf_als_grid["reg_i"], "surprise_bestKNN.csv")
+            knn_surprise(data_train, perf_knn_grid["n_epochs"], perf_knn_grid["reg_u"], perf_knn_grid["reg_i"], "surprise_bestKNN.csv")
 
         elif(i == 1):
             # Manual grid search so we can see the values (only the result is given with the GridSearch of surprise)
-            grid_search_als(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN10.xlsx')
+            grid_search_knn(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN10.xlsx')
             # KNN with the best params from GridSearch surprise
-            knn_surprise(data_train, perf_als_grid["n_epochs"], perf_als_grid["reg_u"], perf_als_grid["reg_i"],"surprise_bestKNN10.csv")
+            knn_surprise(data_train, perf_knn_grid["n_epochs"], perf_knn_grid["reg_u"], perf_knn_grid["reg_i"],"surprise_bestKNN10.csv")
         elif (i == 2):
             # Manual grid search so we can see the values (only the result is given with the GridSearch of surprise)
-            grid_search_als(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN20.xlsx')
+            grid_search_knn(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN20.xlsx')
             # KNN with the best params from GridSearch surprise
-            knn_surprise(data_train, perf_als_grid["n_epochs"], perf_als_grid["reg_u"], perf_als_grid["reg_i"],"surprise_bestKNN20.csv")
+            knn_surprise(data_train, perf_knn_grid["n_epochs"], perf_knn_grid["reg_u"], perf_knn_grid["reg_i"],"surprise_bestKNN20.csv")
         else:
             # Manual grid search so we can see the values (only the result is given with the GridSearch of surprise)
-            grid_search_als(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN50.xlsx')
+            grid_search_knn(data_train, data_test, n_epochs, reg_us, reg_is, 'surpise_manualGS_KNN50.xlsx')
             # KNN with the best params from GridSearch surprise
-            knn_surprise(data_train, perf_als_grid["n_epochs"], perf_als_grid["reg_u"], perf_als_grid["reg_i"],"surprise_bestKNN50.csv")
+            knn_surprise(data_train, perf_knn_grid["n_epochs"], perf_knn_grid["reg_u"], perf_knn_grid["reg_i"],"surprise_bestKNN50.csv")
 
         #SVD (takes to long to test all of them but you can check)
         #n_epochs = [5,10]

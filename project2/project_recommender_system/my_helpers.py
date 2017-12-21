@@ -27,23 +27,6 @@ def parse_row(row):
     return row, col, rating
 
 
-# def make_matrix(data):
-#     rows = []
-#     cols = []
-#     ratings = []
-#     max_row = 0
-#     max_col = 0
-#     for iRow in data:
-#         row, col, rating = parse_row(iRow)
-#         rows.append(row)
-#         cols.append(col)
-#         ratings.append(rating)
-#         max_row = max(row, max_row)
-#         max_col = max(col, max_col)
-#     print(max_row, max_col)
-#     return csr.csr_matrix((ratings, (rows, cols)), shape=[max_row + 1, max_col + 1])
-
-
 # Taken from helpers from lab10
 def build_index_groups(train):
     """build groups for nnz rows and cols."""
@@ -59,7 +42,7 @@ def build_index_groups(train):
                          for g, value in grouped_nz_train_bycol]
     return nz_train, nz_row_colindices, nz_col_rowindices
 
-# Here it's a group by index
+
 # Taken from helpers from lab10
 def group_by(data, index):
     """group list of list by a specific index."""

@@ -4,7 +4,7 @@ from my_helpers import make_prediction_surprise
 
 
 def knn_surprise(data_train, n_epoch, reg_u, reg_i, name_file):
-    print('ALS Surprise')
+    print('KNN Surprise')
 
     #We construct our KNN algo with surprise and the best parameters
     bsl_options = {'method': 'als',

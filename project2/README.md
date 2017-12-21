@@ -28,4 +28,13 @@ on data train then compute baselines with data test
 
 #### ALS.py
 Contains ALS implementation (not the surprise one)
-*
+* compute_error: computes the rmse for given parameters
+* init_MF: initialize the parameters for the matrix factorization
+* update_user_feature: makes one step for the user features
+* update_item_feature: makes one step for the item features
+* run_ALS: consecutively update user and item features until the reduction of error between two iterations becomes smaller than 
+the change threshold
+* create_ALS_pred: creates a prediction using ALS and the cross-validated hyperparameters. The prediction is written in prediction.csv
+takes between 10 and 20 minutes to run
+* cross_val_fix_num: cross-validates using ALS and train and validation data. The lambdas are set as np.logspace(-2, 0, 4). You can 
+change the lambdas number of values or range as your patience increases

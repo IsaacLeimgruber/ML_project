@@ -1,7 +1,8 @@
-from my_helpers import build_index_groups
 import scipy.sparse as sp
 import numpy as np
-
+from my_helpers import create_submission
+from my_helpers import parse_row
+from my_helpers import build_index_groups
 # All this file code is taken from lab10
 # only change is in the ALS function. We changed the parameter list, giving hyper parameters
 # as parameters for cross-validation
@@ -19,7 +20,8 @@ def init_MF(train, num_features):
     """init the parameter for matrix factorization."""
 
     num_item, num_user = train.get_shape()
-
+    print("num item", num_item)
+    print("num user", num_user)
     user_features = np.random.rand(num_features, num_user)
     item_features = np.random.rand(num_features, num_item)
 
@@ -71,13 +73,13 @@ def update_item_feature(
     return updated_item_features
 
 
-def run_ALS(train, test, num_features, lambda_user, lambda_item):
+def run_ALS(train, test, num_features, lambda_user, lambda_item, vali):
     """Alternating Least Squares (ALS) algorithm."""
     # define parameters
     #num_features = 20  # K in the lecture notes
     #lambda_user = 0.1
     #lambda_item = 0.7
-    stop_criterion = 1e-4
+    stop_criterion = 1e-3
     change = 1
     error_list = [0, 0]
 
@@ -92,7 +94,6 @@ def run_ALS(train, test, num_features, lambda_user, lambda_item):
 
     # group the indices by row or column index
     nz_train, nz_item_userindices, nz_user_itemindices = build_index_groups(train)
-
     # run ALS
     print("\nstart the ALS algorithm with num_features: {}, lambda_user: {}, lambda_item: {}"
           .format(num_features, lambda_user , lambda_item))
@@ -106,13 +107,41 @@ def run_ALS(train, test, num_features, lambda_user, lambda_item):
             nnz_users_per_item, nz_item_userindices)
 
         error = compute_error(train, user_features, item_features, nz_train)
-        print("RMSE on training set: {}.".format(error))
         error_list.append(error)
         change = np.fabs(error_list[-1] - error_list[-2])
 
-    # evaluate the test error
-    nnz_row, nnz_col = test.nonzero()
-    nnz_test = list(zip(nnz_row, nnz_col))
-    rmse = compute_error(test, user_features, item_features, nnz_test)
-    print("test RMSE after running ALS: {v}.".format(v=rmse))
-    return rmse, user_features, item_features
+    if(vali):
+        # evaluate the test error
+        nnz_row, nnz_col = test.nonzero()
+        nnz_test = list(zip(nnz_row, nnz_col))
+        rmse = compute_error(test, user_features, item_features, nnz_test)
+        return error_list[-1], rmse, user_features, item_features
+    else:
+        return error_list[-1], 0, user_features, item_features
+
+def create_ALS_pred(full_data, sub_data):
+    num_feature = 20
+    user_lambda = 1.0
+    item_lambda = 0.01
+    train_error, rmse, users, items = run_ALS(full_data, 0, num_feature, user_lambda, item_lambda, 0)
+    prediction = []
+    for iRow in sub_data:
+        user, movie, rating = parse_row(iRow)
+        item_info = items[:, movie]
+        user_info = users[:, user]
+        pred = user_info.T.dot(item_info)
+        prediction.append(np.round([user + 1, movie + 1, pred]))
+    create_submission(prediction, "prediction.csv")
+
+def cross_val_fix_num(num_feature, train, test):
+    user_lambdas = np.logspace(-2, 0, 4)
+    item_lambdas = np.logspace(-2, 0, 4)
+    cross_val_rmse = []
+    i = 0
+    for user_l in user_lambdas:
+        for item_l in item_lambdas:
+            train_rmse, rmse, users, items = run_ALS(train, test, num_feature, user_l, item_l, 1)
+            cross_val_rmse.append([num_feature, user_l, item_l, train_rmse, rmse])
+            print("iteration {} rmse:{} ".format(i, cross_val_rmse))
+            i = i + 1
+    np.savetxt("cross_val_fixed_f2.csv", cross_val_rmse, delimiter=",")

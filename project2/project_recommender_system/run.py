@@ -1,10 +1,15 @@
 import numpy as np
 import scipy.sparse as csr
 from random import shuffle
+from random import seed
+from my_helpers import parse_row
+from my_helpers import compute_baselines
+from my_helpers import split_data
+from my_helpers import calculate_averages
+from my_helpers import construct_data
 from ALS import run_ALS
-from plots import plot_raw_data
-from helpers import *
-from my_helpers import *
+from ALS import create_ALS_pred
+
 import scipy.sparse as sp
 #from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
@@ -14,40 +19,28 @@ DATA_PATH_SUB = "sample_submission.csv"
 
 
 def main():
+
     data = np.genfromtxt(DATA_PATH, delimiter=",", skip_header=1, dtype=str)
     sub_data = np.genfromtxt(DATA_PATH_SUB, delimiter=",", skip_header=1, dtype=str)
 
     userId, movieId, rating = construct_data(data);
-
     indices_to_shuffle = np.array(range(len(userId)))
-    print("test")
+
 
     X_train_userId, X_train_movieId, X_train_rating, X_test_userId, X_test_movieId, X_test_rating = split_data(indices_to_shuffle, userId, movieId, rating, 70)
 
-    data_XTrain = csr.csr_matrix((X_train_rating, (X_train_userId, X_train_movieId)), shape=(10000, 1000))
-    data_XTest = csr.csr_matrix((X_test_rating, (X_test_userId, X_test_movieId)), shape=(10000, 1000))
-    #print((data_XTrain.T).index(928))
-    # attention no movie 928?
+    full_data = csr.csr_matrix((rating, (userId, movieId)), shape=(10000, 1000)).transpose()
+    data_XTrain = csr.csr_matrix((X_train_rating, (X_train_userId, X_train_movieId)), shape=(10000, 1000))\
+        .transpose()
+    data_XTest = csr.csr_matrix((X_test_rating, (X_test_userId, X_test_movieId)), shape=(10000, 1000))\
+        .transpose()
 
-    print("TEST ALS")
+    full_data.eliminate_zeros()
+    data_XTrain.eliminate_zeros()
+    data_XTest.eliminate_zeros()
+    global_avg = data_XTrain[data_XTrain.nonzero()].mean()
 
-    #rmse, users, items = run_ALS(data_XTrain, data_XTest, 20, 0.1, 0.7)
-    rmse, users, items = run_ALS(data_XTrain, data_XTest, 20, 31.8553, 20.05672522)
-    print("rmse als", rmse)
-    print("rmse users", np.shape(users))
-    print("rmse items", np.shape(items))
-
-
-    #prediction = []
-    #for iRow in sub_data:
-    #    user, movie, rating = parse_row(iRow)
-    #    rate = int(np.round(avgMovie[movie]))
-    #    #rate = avgGlobal
-    #    prediction.append([user+1, movie+1, rate])
-
-    #create_submission(prediction, "GLOBAL_MOVIE_AVG.csv")
-    #create_submission(prediction, "GLOBAL_AVG.csv")
-
+    create_ALS_pred(full_data, sub_data)
 
 if __name__ == '__main__':
     main()

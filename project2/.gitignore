@@ -2,4 +2,4 @@
 *.ida
 project_recommender_system/data_train.csv
 project_text_classification/*
-project_reccomender_system/others/*
+project_recomender_system/others/*

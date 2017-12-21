@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from my_helpers import *
-from cross_validation_surprise import *
+from surprise_cross_validation import *
 from surprise_knn import knn_surprise
 from surprise_svd import svd_surprise
 from surprise import Reader
@@ -9,9 +9,9 @@ from surprise import Dataset
 import xlrd
 
 DATA_PATH = "data_train.csv"
-DATA_PATH_10 = "keep_users_bigger_10_rating.xlsx"
-DATA_PATH_20 = "keep_users_bigger_20_rating.xlsx"
-DATA_PATH_50 = "keep_users_bigger_50_rating.xlsx"
+DATA_PATH_10 = "users_movies_bigger_10_rating.xlsx"
+DATA_PATH_20 = "users_movies_bigger_20_rating.xlsx"
+DATA_PATH_50 = "users_movies_bigger_50_rating.xlsx"
 DATA_PATH_SUB = "sample_submission.csv"
 
 

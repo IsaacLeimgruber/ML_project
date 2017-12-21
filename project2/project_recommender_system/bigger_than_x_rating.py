@@ -23,7 +23,7 @@ def main():
         result_user_movie = pd.DataFrame(user_movie_temp)
 
         # write the dataframe on xlsx so we can keep the value
-        writer = pd.ExcelWriter('keep_users_bigger_'+str(i)+'_rating.xlsx', engine='xlsxwriter')
+        writer = pd.ExcelWriter('users_movies_bigger_'+str(i)+'_rating.xlsx', engine='xlsxwriter')
         result_user_movie.to_excel(writer, 'Sheet1')
         writer.save()
 

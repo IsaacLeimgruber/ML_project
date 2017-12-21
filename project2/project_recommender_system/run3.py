@@ -1,46 +1,48 @@
 import numpy as np
-import scipy.sparse as csr
-from my_helpers import make_matrix
-from sklearn.model_selection import train_test_split
+import pandas as pd
+from my_helpers import *
+from cross_validation import *
+from ALS_surprise import als_surprise
+from SVD_surprise import svd_surprise
+from surprise import Reader
+from surprise import Dataset
+
 
 # https://www.overleaf.com/12522751fsgrdpydrwxf READ and EDIT link for report
 
-DATA_PATH_TRAIN = "data_train.csv"
+DATA_PATH = "data_train.csv"
 DATA_PATH_SUB = "sample_submission.csv"
 
 
 def main():
-    data = np.genfromtxt(DATA_PATH_TRAIN, delimiter=",", skip_header=1, dtype=str)
-    ratings = make_matrix(data)
-    print("ratings", ratings)
-    nnz = ratings.nonzero()
-    print("nnz",nnz)
-    global_mean = ratings[nnz].mean()
-    print("glob_mean", global_mean)
-    print("ratings[nnz]", ratings[nnz])
-    print("nnz[0]", list(set(nnz[0])))
-    print("ratings[nnz[0]]", ratings.getnnz(0)[1])
-    #nnz_users = ratings[nnz[0]]
-    #print(nnz_users)
-    user_means, movie_means = compute_user_movie_avg(nnz, ratings)
-    print("user_means", user_means)
-    print("movie_means", movie_means)
+    data_import = np.genfromtxt(DATA_PATH, delimiter=",", skip_header=1, dtype=str)
+    userId, movieId, rating = construct_data(data_import);
 
-def compute_user_movie_avg(nnz, ratings):
-    users, movies = nnz
-    user_means = np.zeros(ratings.get_shape()[0])
-    movie_means = np.zeros(ratings.get_shape()[1])
-    entries = zip(users, movies)
-    print(entries)
-    for entry in entries:
-        rating = ratings[entry[0], entry[1]]
-        user_means[entry[0]] = user_means[entry[0]] + rating
-        movie_means[entry[1]] = movie_means[entry[1]] + rating
-    for user in list(set(users)):
-        user_means[user] = user_means[user]/ratings.getnnz(axis=1)[user]
-    for movie in list(set(movies)):
-        movie_means[movie] = movie_means[movie]/ratings.getnnz(axis=0)[movie]
-    return user_means, movie_means
+    ratings_dict = {'itemID': movieId,
+                    'userID': userId,
+                    'rating': rating}
+
+    df = pd.DataFrame(ratings_dict)
+    reader = Reader(rating_scale=(1, 5))
+    data = Dataset.load_from_df(df[['userID', 'itemID', 'rating']], reader)
+    data.split(3)
+
+    perf_als_grid = grid_search_als(data)
+
+    perf_als, predictions_als = als_surprise(df, perf_als_grid["n_epochs"], perf_als_grid["reg_u"], perf_als_grid["reg_i"], 0)
+
+    make_prediction(predictions_als, "ALS_best.csv")
+
+
+
+    perf_als_grid = grid_search_svd(data)
+
+    #svd_surprise(data, reg_all, init_mean, n_epochs, lr_all)
+    perf, predictions_svd = svd_surprise(df, perf_als_grid["reg_all"], perf_als_grid["init_mean"], perf_als_grid["n_epochs"], perf_als_grid["lr_all"], perf_als_grid["n_factors"])
+
+    make_prediction(predictions_svd, "SVD_best.csv")
+
+
 
 if __name__ == '__main__':
     main()

@@ -84,3 +84,50 @@ def create_submission(data, filename="submission.csv"):
     for user, movie, rating in data:
         f.write('r{0}_c{1},{2}'.format(user,movie,rating) + "\n")
     f.close()
+
+
+def keep_user_bigger_x_ratings(userId, movieId, rating, nb_rating):
+    new_userId = list(userId)
+    new_movieId = list(movieId)
+    new_rating = list(rating)
+
+    for i in range(10000):
+        if(i % 1000 == 0):
+            print(i)
+        idx_occurences = [k for k,val in enumerate(new_userId) if val==i]
+        if(len(idx_occurences) < nb_rating and len(idx_occurences) > 0):
+            print("DELET")
+            for j in idx_occurences:
+                new_userId = new_userId[:j] + new_userId[j + 1:]
+                new_movieId = new_movieId[:j] + new_movieId[j + 1:]
+                new_rating = new_rating[:j] + new_rating[j + 1:]
+
+
+    for i in range(1000):
+        if (i % 100 == 0):
+            print(i)
+        idx_occurences = [k for k,val in enumerate(new_movieId) if val==i]
+        if(len(idx_occurences) < nb_rating and len(idx_occurences) > 0):
+            print("DELET")
+            for j in idx_occurences:
+                new_userId = new_userId[:j] + new_userId[j + 1:]
+                new_movieId = new_movieId[:j] + new_movieId[j + 1:]
+                new_rating = new_rating[:j] + new_rating[j + 1:]
+
+
+    return new_userId, new_movieId, new_rating
+
+
+def make_prediction(algo, name_file):
+
+    DATA_PATH_SUB = "sample_submission.csv"
+    sub_data = np.genfromtxt(DATA_PATH_SUB, delimiter=",", skip_header=1, dtype=str)
+
+    prediction = []
+    for iRow in sub_data:
+        user, movie, rating = parse_row(iRow)
+        rate = int(np.round(algo.predict(user, movie).est))
+        # rate = avgGlobal
+        prediction.append([user + 1, movie + 1, rate])
+
+    create_submission(prediction, name_file)

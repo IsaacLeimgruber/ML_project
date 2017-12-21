@@ -55,7 +55,7 @@ def main():
 
     print("TEST SGD")
 
-    sgd(data_XTrain, data_XTest)
+    #sgd(data_XTrain, data_XTest)
 
 
 if __name__ == '__main__':

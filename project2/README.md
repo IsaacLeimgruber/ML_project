@@ -1,8 +1,10 @@
 ## How tu run our code
 You can obtain our result on kaggle by running the program run.py
-The waiting time is approximately: 30 min thinkpad 30min on Mac once 1h30.
+The waiting time is approximately: 30 min thinkpad, on Mac once 1h30.
 which will execute ALS on the data with the best hyperparameters we found
 with the cross-validation. The predictions will be in the file prediction.csv
+
+Don't forget to install surprise packet : pip install scikit-surprise
 
 ## KNN version
 You can run the KNN version by calling knn_surprise from surprise_knn which will create a prediction in the file which filename is given as parameter
